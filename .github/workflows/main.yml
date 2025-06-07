@@ -7,8 +7,8 @@ on:
 
 jobs:
   build:
+    name: Build the app
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -33,9 +33,10 @@ jobs:
     name: Deploy to Render
     runs-on: ubuntu-latest
     steps:
-    - name: Trigger deploy on Render
-      run: |
-        curl -X POST https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys \
-        -H 'Accept: application/json' \
-        -H 'Authorization: Bearer ${{ secrets.RENDER_API_KEY }}' \
-        -H 'Content-Type: application/json'
+    - name: Deploy to Render
+      if: ${{ github.event_name == 'push' }}
+      uses: sws2apps/render-deployment@main
+      with:
+        serviceId: ${{ secrets.RENDER_SERVICE_ID }}
+        apiKey: ${{ secrets.RENDER_API_KEY }}
+        multipleDeployment: false
